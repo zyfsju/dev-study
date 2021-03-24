@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  db-api:
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+    environment:
+      - "DB_HOST=mysql-${TAG}"
+      - DB_PORT=3306
+      - "DB_NAME=${DB_NAME}"
+      - "DB_USER=${DB_USER}"
+      - "DB_PWD=${DB_PWD}"
+    volumes:
+      - ../sql_app:/opt/app/sql_app
+      - ../methods:/opt/app/methods
+      - ../reports:/opt/app/reports
+    working_dir: /opt/app/sql_app
+    tty: true
+    expose:
+      - "8000"
+    read_only: false
+    ports:
+      - "${API_PORT}:8000"
+    container_name: "db-api-${TAG}"
+    command:
+      [
+        "uvicorn",
+        "main:app",
+        "--host",
+        "0.0.0.0",
+        "--reload",
+        "--port",
+        "8000",
+        "--reload-dir",
+        "./",
+      ]
+    depends_on:
+      - mysql-development
+
+  mysql-development:
+    image: mysql:8.0.17
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PWD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+    ports:
+      - "${DB_PORT}:3306"
+    container_name: "mysql-${TAG}"
+    volumes:
+      - "../data/db-${TAG}:/var/lib/mysql"
