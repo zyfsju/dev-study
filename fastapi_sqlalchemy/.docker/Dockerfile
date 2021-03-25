@@ -1,5 +1,5 @@
 # ---- Base python ----
-FROM vst-common:latest AS base
+FROM my-common:latest AS base
 ARG ROOT_PATH=""
 ENV ROOT_PATH=$ROOT_PATH
 
