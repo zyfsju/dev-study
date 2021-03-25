@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-api
+  template:
+    metadata:
+      labels:
+        app: my-app-api
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: my-app-api
+        image: myacr.azurecr.io/my-app-api:v0.0.1
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: db-secret
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+  selector:
+    app: my-app-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-front
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: my-app-front
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: my-app-front
+        image: myacr.azurecr.io/my-app-front:v0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-front
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: my-app-front
