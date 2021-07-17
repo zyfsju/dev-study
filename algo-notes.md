@@ -1,6 +1,11 @@
 
 1. Find all combinations and permutations. -> DFS
-2. How many permutations -> DP
+
+  - visited when forming the current permutation/path
+  - cuurent permutation/path
+  - all permutations/paths
+
+3. How many permutations -> DP
 
 Examples:
 - DP: How many ways from top-left to bottom-right
@@ -18,3 +23,6 @@ Perception tools
 - rviz
 - ROS
 - RTI DDS (Data Distribution Service)
+
+DFS
+https://leetcode.com/problems/permutation-in-string/ 567. Permutation in String
